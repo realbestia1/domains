@@ -1,0 +1,35 @@
+name: Update domains
+
+on:
+  schedule:
+    - cron: "0 */2 * * *" # ogni 2 ore
+  workflow_dispatch: # avvio manuale
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-domains
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Aggiorna domini
+        run: python scripts/update_domains.py
+      - name: Commit e push se cambiato
+        run: |
+          if git diff --quiet -- domains.json; then
+            echo "Nessun cambio"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add domains.json
+          git commit -m "Update domains.json (auto)"
+          git push
