@@ -1,7 +1,7 @@
 """Aggiorna guardoserie + sc in domains.json. Solo stdlib, idempotente.
 
 - guardoserie: estratto dal link in https://guardaserie.foo/
-- sc: segue il redirect del dominio salvato (il vecchio porta al nuovo)
+- sc, fctv33: seguono il redirect del dominio salvato (il vecchio porta al nuovo)
 - Salva solo se il candidato risponde HTTP 200, altrimenti tiene il vecchio.
 """
 import json
@@ -51,17 +51,18 @@ def resolve_guardoserie():
     return None
 
 
-def resolve_sc(current):
+def resolve_redirect(key, current):
     with fetch(current) as r:  # urllib segue i redirect: l'URL finale e' il nuovo dominio
         new = origin(r.geturl())
-    print(f"sc: {current} -> {new}")
+    print(f"{key}: {current} -> {new}")
     return new
 
 
 def main():
     data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
     for key, resolver in (("guardoserie", lambda: resolve_guardoserie()),
-                          ("sc", lambda: resolve_sc(data["sc"]))):
+                          ("sc", lambda: resolve_redirect("sc", data["sc"])),
+                          ("fctv33", lambda: resolve_redirect("fctv33", data["fctv33"]))):
         try:
             new = resolver()
         except Exception as e:
