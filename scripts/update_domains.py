@@ -62,7 +62,8 @@ def main():
     data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
     for key, resolver in (("guardoserie", lambda: resolve_guardoserie()),
                           ("sc", lambda: resolve_redirect("sc", data["sc"])),
-                          ("fctv33", lambda: resolve_redirect("fctv33", data["fctv33"]))):
+                          ("fctv33", lambda: resolve_redirect("fctv33", data["fctv33"])),
+                          ("dlhd", lambda: resolve_redirect("dlhd", data["dlhd"]))):
         try:
             new = resolver()
         except Exception as e:
@@ -74,7 +75,6 @@ def main():
         else:
             print(f"{key}: nessun cambio (attuale {data.get(key)})")
     JSON_PATH.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
-
-
+    
 if __name__ == "__main__":
     main()
