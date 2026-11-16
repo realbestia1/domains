@@ -20,6 +20,28 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
+      - name: Installa e avvia Cloudflare WARP (proxy locale)
+        continue-on-error: true
+        run: |
+          curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg \
+            | sudo gpg --yes --dearmor -o /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" \
+            | sudo tee /etc/apt/sources.list.d/cloudflare-client.list
+          sudo apt-get update
+          sudo apt-get install -y cloudflare-warp
+          sudo systemctl start warp-svc || (sudo warp-svc >/dev/null 2>&1 &)
+          sleep 3
+          sudo warp-cli --accept-tos registration new
+          sudo warp-cli --accept-tos mode proxy
+          sudo warp-cli --accept-tos proxy port 40000
+          sudo warp-cli --accept-tos connect
+          sleep 5
+          if curl -sS --max-time 10 -x http://127.0.0.1:40000 https://www.cloudflare.com/cdn-cgi/trace 2>/dev/null | grep -q '^warp=on'; then
+            echo "HTTPS_PROXY=http://127.0.0.1:40000" >> "$GITHUB_ENV"
+            echo "WARP attivo: proxy esportato per questo job"
+          else
+            echo "WARP non attivo: proseguo senza proxy (comportamento invariato)"
+          fi
       - name: Aggiorna domini
         run: python scripts/update_domains.py
       - name: Commit e push se cambiato
