@@ -62,6 +62,7 @@ def main():
     data = json.loads(JSON_PATH.read_text(encoding="utf-8"))
     for key, resolver in (("guardoserie", lambda: resolve_guardoserie()),
                           ("sc", lambda: resolve_redirect("sc", data["sc"])),
+                          ("au", lambda: resolve_redirect("au", data["au"])),
                           ("fctv33", lambda: resolve_redirect("fctv33", data["fctv33"])),
                           ("dlhd", lambda: resolve_redirect("dlhd", data["dlhd"]))):
         try:
