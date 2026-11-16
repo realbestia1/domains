@@ -13,7 +13,13 @@ from urllib.parse import urlsplit, urlunsplit
 BASE = Path(__file__).resolve().parent.parent
 JSON_PATH = BASE / "domains.json"
 TIMEOUT = 20
-UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) domains-bot/1.0"}
+UA = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "it-IT,it;q=0.9,en;q=0.8",
+    "Accept-Encoding": "identity",
+    "Upgrade-Insecure-Requests": "1",
+}
 PARKING = ("domain for sale", "buy this domain", "parked domain", "domain parking")
 
 
